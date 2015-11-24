@@ -2,6 +2,8 @@ package com.shengping.paotui.handler;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shengping.paotui.handler.model.ReturnMessage;
 import com.shengping.paotui.model.Dx_Member;
+import com.shengping.paotui.model.Dx_Order;
+import com.shengping.paotui.model.Dx_RecAddress;
 import com.shengping.paotui.service.ApplicationService;
 import com.shengping.paotui.service.Dt_SysConfigService;
 import com.shengping.paotui.service.Dx_MemberService;
@@ -67,8 +71,15 @@ public class CustomerHandler {
 			Dx_Member member=new Dx_Member();
 			member.setM_Mobile(phone);
 			member.setM_PsW(pwd);
-			if(dx_MemberService.register(member)>0){
+			int id=dx_MemberService.register(member);
+			member.setM_ID(id);
+			member.setM_SYMoney(0);
+			String token=TokenProcessor.getInstance().generateTokeCode();
+			applicationService.addToken_Shop(phone,token);
+			member.setToken(token);
+			if(id>0){
 				returnMessage.setStatus(true);
+				returnMessage.setData(member);
 				returnMessage.setMessage("注册成功！");
 			}else{
 				returnMessage.setStatus(false);
@@ -155,9 +166,22 @@ public class CustomerHandler {
 		return returnMessage;
 	}
 	@RequestMapping(value="/downOrder", method = RequestMethod.POST)	//用户下单
-	public ReturnMessage downOrder(@RequestParam(value = "token", required = true) String token){
+	public ReturnMessage downOrder(@RequestParam(value = "token", required = true) String token,@Validated Dx_Order order,BindingResult result
+			,@RequestParam(value = "phone", required = true) String phone,@RequestParam(value = "location_start", required = true) String location_start,@RequestParam(value = "address_end", required = true) String address_end
+			,@RequestParam(value = "location_end", required = true) String location_end,@RequestParam(value = "address_start", required = true) String address_start
+			,@RequestParam(value = "transportation", required = true) String transportation){
 		ReturnMessage returnMessage=new ReturnMessage();
-		
+		if(result.hasErrors()){
+			returnMessage.setStatus(false);
+			returnMessage.setMessage(result.getFieldError().getDefaultMessage());
+		}else{
+			if(applicationService.checkTokenOfShop(token)){
+				Dx_RecAddress address=new Dx_RecAddress();//添加收货地址
+			}else{
+				returnMessage.setStatus(false);
+				returnMessage.setMessage("非法操作");
+			}
+		}
 		return returnMessage;
 	}
 }

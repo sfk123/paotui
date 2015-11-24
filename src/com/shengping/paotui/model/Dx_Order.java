@@ -8,10 +8,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.NotEmpty;
 @Entity
 public class Dx_Order {
 //订单表
 	private int id;
+	@NotEmpty(message="用户id不能为空")
 	private int UserId;//用户ID (Dx_Member.M_ID)
 	private String OrderNumber;//订单号
 	private Date CreateTime;//下单时间
@@ -22,15 +24,19 @@ public class Dx_Order {
 	private int UseDHJF;
 	private double UseDHJE;
 	private double UserDJZK;
+	@NotEmpty(message="订单总额不能为空")
 	private double PayMoney;//订单总额
 	private int PayJF;
+	@NotEmpty(message="订单类型不能为空")
 	private int FwType;//订单类型  1美食 2帮我买 3帮我送4
 	private int Qrzt;
+	@NotEmpty(message="付款方式不能为空")
 	private int FKzt;//付款方式  0货到付款 、1已经支付
 	private Date Fktime;//付款时间
 	private int Djzt;
 	private int PSYID;//跑腿哥id（Dx_Clerks.CL_ID）
-	private String  Areaid;//跑腿公司城市编码
+	@NotEmpty(message="当前城市编码不能为空")
+	private String  Areaid;//当前订单城市编码
 	private String useridd;
 	private int Chick;
 	private double BaoZhuang;//包装费
