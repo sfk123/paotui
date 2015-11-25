@@ -47,7 +47,6 @@ public class Dx_Order {
 	 * 以下发货地址  帮我送等用到
 	 */
 	private String StartAddress;//发货地址
-	private String StartAddress_detail;//发货地址详细
 	private String StartLocation;//发货地址坐标
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@GenericGenerator(name = "persistenceGenerator", strategy = "increment") 
@@ -213,12 +212,6 @@ public class Dx_Order {
 	}
 	public void setStartAddress(String startAddress) {
 		StartAddress = startAddress;
-	}
-	public String getStartAddress_detail() {
-		return StartAddress_detail;
-	}
-	public void setStartAddress_detail(String startAddress_detail) {
-		StartAddress_detail = startAddress_detail;
 	}
 	public String getStartLocation() {
 		return StartLocation;

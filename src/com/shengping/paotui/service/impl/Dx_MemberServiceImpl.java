@@ -26,7 +26,7 @@ public class Dx_MemberServiceImpl implements Dx_MemberService{
 	@Override
 	public Dx_Member Login(String phone, String pwd) {
 		Dx_Member member=dx_MemberDao.getByPhone(phone);
-		if(MyUtil.stringToMD5(member.getM_PsW()).equals(pwd)){
+		if(member!=null&&MyUtil.stringToMD5(member.getM_PsW()).equals(pwd)){
 			return member;
 		}
 		return null;

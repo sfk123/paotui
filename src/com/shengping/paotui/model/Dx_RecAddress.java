@@ -4,27 +4,33 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 @Entity
 public class Dx_RecAddress {
 //用户收货地址表
 	private int Id;
+	@NotNull(message="用户编号不能为空")
 	private int UserId;//用户编号(Dx_Member.M_ID)
+	@NotBlank(message="姓名不能为空")
 	private String RealName;//姓名
 	private int ProvinceId;//
 	private int CityId;
 	private int DistrictId;
-	private String Address;
+	@NotBlank(message="收货地址不能为空")
+	private String Address;//收货地址
 	private String Zip;
-	private String Phone;
-	private String Mobile;
+	@NotBlank(message="手机不能为空")
+	private String Mobile;//手机
 	private String QQ;
 	private int OrderIndex;//排序
+	@NotBlank(message="坐标不能为空")
 	private String sGPRS;//收货坐标
-	private String sdizhi;//收货地址
-	private String sAddress;//详细地址
-	private String jtgj;//交通工具
+	@NotBlank(message="性别不能为空")
+	private String sex;//先生或女士
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@GenericGenerator(name = "persistenceGenerator", strategy = "increment") 
 	@Id
@@ -76,12 +82,6 @@ public class Dx_RecAddress {
 	public void setZip(String zip) {
 		Zip = zip;
 	}
-	public String getPhone() {
-		return Phone;
-	}
-	public void setPhone(String phone) {
-		Phone = phone;
-	}
 	public String getMobile() {
 		return Mobile;
 	}
@@ -106,24 +106,11 @@ public class Dx_RecAddress {
 	public void setsGPRS(String sGPRS) {
 		this.sGPRS = sGPRS;
 	}
-	public String getSdizhi() {
-		return sdizhi;
+	public String getSex() {
+		return sex;
 	}
-	public void setSdizhi(String sdizhi) {
-		this.sdizhi = sdizhi;
-	}
-	public String getsAddress() {
-		return sAddress;
-	}
-	public void setsAddress(String sAddress) {
-		this.sAddress = sAddress;
-	}
-	
-	public String getJtgj() {
-		return jtgj;
-	}
-	public void setJtgj(String jtgj) {
-		this.jtgj = jtgj;
+	public void setSex(String sex) {
+		this.sex = sex;
 	}
 	
 }

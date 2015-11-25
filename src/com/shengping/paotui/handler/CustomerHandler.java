@@ -16,6 +16,7 @@ import com.shengping.paotui.model.Dx_RecAddress;
 import com.shengping.paotui.service.ApplicationService;
 import com.shengping.paotui.service.Dt_SysConfigService;
 import com.shengping.paotui.service.Dx_MemberService;
+import com.shengping.paotui.service.Dx_RecAddressService;
 import com.shengping.paotui.util.TokenProcessor;
 
 @RequestMapping("/customerservice")
@@ -28,6 +29,8 @@ public class CustomerHandler {
 	private ApplicationService applicationService;
 	@Autowired
 	private Dt_SysConfigService dt_SysConfigService;
+	@Autowired
+	private Dx_RecAddressService dx_RecAddressService;
 	@RequestMapping(value="/sendCode", method = RequestMethod.POST)	//跑腿哥注册
 	public ReturnMessage SendCode(@RequestParam(value = "phone", required = true) String phone){
 		ReturnMessage returnMessage=new ReturnMessage();
@@ -181,6 +184,39 @@ public class CustomerHandler {
 				returnMessage.setStatus(false);
 				returnMessage.setMessage("非法操作");
 			}
+		}
+		return returnMessage;
+	}
+	@RequestMapping(value="/crearAddress", method = RequestMethod.POST)//添加收货地址
+	public ReturnMessage crearAddress(@RequestParam(value = "token", required = true) String token,@Validated Dx_RecAddress address,BindingResult result){
+		ReturnMessage returnMessage=new ReturnMessage();
+		if(result.hasErrors()){
+			returnMessage.setStatus(false);
+			returnMessage.setMessage(result.getFieldError().getDefaultMessage());
+		}else{
+			if(applicationService.checkTokenOfShop(token)){
+				int id=dx_RecAddressService.creatAddress(address);
+				address.setId(id);
+				returnMessage.setStatus(true);
+				returnMessage.setMessage("添加成功");
+				returnMessage.setData(address);
+			}else{
+				returnMessage.setStatus(false);
+				returnMessage.setMessage("非法操作");
+			}
+		}
+		return returnMessage;
+	}
+	@RequestMapping(value="/getAddressList", method = RequestMethod.POST)//添加收货地址
+	public ReturnMessage getAddressList(@RequestParam(value = "token", required = true) String token,@RequestParam(value = "userid", required = true) int userid){
+		ReturnMessage returnMessage=new ReturnMessage();
+		if(applicationService.checkTokenOfShop(token)){
+			
+			returnMessage.setStatus(true);
+			returnMessage.setData(dx_RecAddressService.getAddressList(userid));
+		}else{
+			returnMessage.setStatus(false);
+			returnMessage.setMessage("非法操作");
 		}
 		return returnMessage;
 	}
