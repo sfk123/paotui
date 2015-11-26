@@ -116,6 +116,13 @@ public class Dx_ChildShopsDaoImpl implements Dx_ChildShopsDao{
 		}
 		return true;
 	}
+	@Override
+	public void setPushTag(String tag, int userid) {
+		String hql="update Dx_ChildShops set pushTag=(:tag) where MD_ID=(:id)";
+		Query query=getSession().createQuery(hql).setParameter("tag", tag).setParameter("id", userid);
+		query.executeUpdate();
+		
+	}
 	
 
 }

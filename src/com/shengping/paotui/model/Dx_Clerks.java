@@ -52,6 +52,7 @@ public class Dx_Clerks {
 	@NotNull(message="请选择全职或兼职")
 	private int CL_Zhiwei;//职位 全职1/兼职0
 	private String token;//登陆后的操作令牌 （退出后 设置令牌为空,非数据库字段）
+	private String pushTag;//极光推送标识
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@GenericGenerator(name = "persistenceGenerator", strategy = "increment") 
 	@Id
@@ -215,5 +216,11 @@ public class Dx_Clerks {
 	}
 	public void setToken(String token) {
 		this.token = token;
+	}
+	public String getPushTag() {
+		return pushTag;
+	}
+	public void setPushTag(String pushTag) {
+		this.pushTag = pushTag;
 	}
 }

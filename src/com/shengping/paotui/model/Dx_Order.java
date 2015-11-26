@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -13,7 +14,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class Dx_Order {
 //订单表
 	private int id;
-	@NotEmpty(message="用户id不能为空")
+	@NotNull(message="用户id不能为空")
 	private int UserId;//用户ID (Dx_Member.M_ID)
 	private String OrderNumber;//订单号
 	private Date CreateTime;//下单时间
@@ -24,13 +25,13 @@ public class Dx_Order {
 	private int UseDHJF;
 	private double UseDHJE;
 	private double UserDJZK;
-	@NotEmpty(message="订单总额不能为空")
+	@NotNull(message="订单总额不能为空")
 	private double PayMoney;//订单总额
 	private int PayJF;
-	@NotEmpty(message="订单类型不能为空")
+	@NotNull(message="订单类型不能为空")
 	private int FwType;//订单类型  1美食 2帮我买 3帮我送4
 	private int Qrzt;
-	@NotEmpty(message="付款方式不能为空")
+	@NotNull(message="付款方式不能为空")
 	private int FKzt;//付款方式  0货到付款 、1已经支付
 	private Date Fktime;//付款时间
 	private int Djzt;
@@ -48,6 +49,7 @@ public class Dx_Order {
 	 */
 	private String StartAddress;//发货地址
 	private String StartLocation;//发货地址坐标
+	private String attache;//订单附属属性，jsonobject类型，使用时遍历Key值，并取出相应的value:当FwType为3(帮我送)时 key为：transportation
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@GenericGenerator(name = "persistenceGenerator", strategy = "increment") 
 	@Id
@@ -218,6 +220,12 @@ public class Dx_Order {
 	}
 	public void setStartLocation(String startLocation) {
 		StartLocation = startLocation;
+	}
+	public String getAttache() {
+		return attache;
+	}
+	public void setAttache(String attache) {
+		this.attache = attache;
 	}
 	
 }

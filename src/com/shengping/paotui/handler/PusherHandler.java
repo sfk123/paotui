@@ -143,9 +143,10 @@ public class PusherHandler {
 		return returnMessage;
 	}
 	@RequestMapping(value="/login", method = RequestMethod.POST)	//≈‹Õ»∏Á◊¢≤·
-	public ReturnMessage login(@RequestParam(value = "username", required = true) String username,@RequestParam(value = "pwd", required = true) String pwd){
+	public ReturnMessage login(@RequestParam(value = "username", required = true) String username,@RequestParam(value = "pwd", required = true) String pwd
+			,@RequestParam(value = "pushTag", required = true) String pushTag){
 		ReturnMessage returnMessage=new ReturnMessage();
-		Dx_Clerks clerks=dx_ClerksService.login(username, pwd);
+		Dx_Clerks clerks=dx_ClerksService.login(username, pwd,pushTag);
 		if(clerks!=null){
 			String token=TokenProcessor.getInstance().generateTokeCode();
 			applicationService.addToken_Shop(username,token);

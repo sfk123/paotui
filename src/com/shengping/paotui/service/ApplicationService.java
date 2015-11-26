@@ -16,4 +16,6 @@ public interface ApplicationService {
 	public void removePhoneCode(String phone);
 	public boolean testPhoneCode(String phone,String code);
 	public void removeMapKey(String key,String map);
+	public String getPushMasterSecret();
+	public String getPushAppKey();
 }

@@ -16,6 +16,7 @@ import com.shengping.paotui.model.Dx_RecAddress;
 import com.shengping.paotui.service.ApplicationService;
 import com.shengping.paotui.service.Dt_SysConfigService;
 import com.shengping.paotui.service.Dx_MemberService;
+import com.shengping.paotui.service.Dx_OrderService;
 import com.shengping.paotui.service.Dx_RecAddressService;
 import com.shengping.paotui.util.TokenProcessor;
 
@@ -31,6 +32,8 @@ public class CustomerHandler {
 	private Dt_SysConfigService dt_SysConfigService;
 	@Autowired
 	private Dx_RecAddressService dx_RecAddressService;
+	@Autowired
+	private Dx_OrderService dx_OrderService;
 	@RequestMapping(value="/sendCode", method = RequestMethod.POST)	//跑腿哥注册
 	public ReturnMessage SendCode(@RequestParam(value = "phone", required = true) String phone){
 		ReturnMessage returnMessage=new ReturnMessage();
@@ -112,6 +115,18 @@ public class CustomerHandler {
 		}
 		return returnMessage;
 	}
+	@RequestMapping(value="/logout", method = RequestMethod.POST)	//用户密码登录
+	public ReturnMessage logout(@RequestParam(value = "token", required = true) String token,@RequestParam(value = "phone", required = true) String phone){
+		ReturnMessage returnMessage=new ReturnMessage();
+		if(applicationService.checkTokenOfShop(token)){
+			applicationService.ShopLogOut(phone);
+			returnMessage.setStatus(true);
+		}else{
+			returnMessage.setStatus(false);
+			returnMessage.setMessage("非法操作");
+		}
+		return returnMessage;
+	}
 	@RequestMapping(value="/login_phone_sendcode", method = RequestMethod.POST)	//用户手机验证码登录 获取验证码
 	public ReturnMessage login_phone_sendcode(@RequestParam(value = "phone", required = true) String phone){
 		ReturnMessage returnMessage=new ReturnMessage();
@@ -169,17 +184,20 @@ public class CustomerHandler {
 		return returnMessage;
 	}
 	@RequestMapping(value="/downOrder", method = RequestMethod.POST)	//用户下单
-	public ReturnMessage downOrder(@RequestParam(value = "token", required = true) String token,@Validated Dx_Order order,BindingResult result
-			,@RequestParam(value = "phone", required = true) String phone,@RequestParam(value = "location_start", required = true) String location_start,@RequestParam(value = "address_end", required = true) String address_end
-			,@RequestParam(value = "location_end", required = true) String location_end,@RequestParam(value = "address_start", required = true) String address_start
-			,@RequestParam(value = "transportation", required = true) String transportation){
+	public ReturnMessage downOrder(@RequestParam(value = "token", required = true) String token,@Validated Dx_Order order,BindingResult result){
 		ReturnMessage returnMessage=new ReturnMessage();
 		if(result.hasErrors()){
 			returnMessage.setStatus(false);
 			returnMessage.setMessage(result.getFieldError().getDefaultMessage());
 		}else{
 			if(applicationService.checkTokenOfShop(token)){
-				Dx_RecAddress address=new Dx_RecAddress();//添加收货地址
+				if(dx_OrderService.addOrder(order)>0){
+					returnMessage.setStatus(true);
+					returnMessage.setMessage("下单成功，请保持电话畅通，等待工作人员与您取得联系");
+				}else{
+					returnMessage.setStatus(false);
+					returnMessage.setMessage("下单失败，请再试一次吧！");
+				}
 			}else{
 				returnMessage.setStatus(false);
 				returnMessage.setMessage("非法操作");
@@ -214,6 +232,19 @@ public class CustomerHandler {
 			
 			returnMessage.setStatus(true);
 			returnMessage.setData(dx_RecAddressService.getAddressList(userid));
+		}else{
+			returnMessage.setStatus(false);
+			returnMessage.setMessage("非法操作");
+		}
+		return returnMessage;
+	}
+	@RequestMapping(value="/getDefaultAddress", method = RequestMethod.POST)//添加收货地址
+	public ReturnMessage getDefaultAddress(@RequestParam(value = "token", required = true) String token,@RequestParam(value = "userid", required = true) int userid){
+		ReturnMessage returnMessage=new ReturnMessage();
+		if(applicationService.checkTokenOfShop(token)){
+			
+			returnMessage.setStatus(true);
+			returnMessage.setData(dx_RecAddressService.getDefaultAddress(userid));
 		}else{
 			returnMessage.setStatus(false);
 			returnMessage.setMessage("非法操作");

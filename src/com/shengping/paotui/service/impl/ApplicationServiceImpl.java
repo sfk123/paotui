@@ -1,8 +1,11 @@
 package com.shengping.paotui.service.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,8 @@ public class ApplicationServiceImpl implements ApplicationService{
 	private Map<String,String> randomCode;
 	private Map<String,PhoneCode> phoneCode;
 	private Map<String ,Map> field;
+	private final String masterSecret="22cae51079c5b39dbef28135";//自高容僕畜埒
+	private final String appKey="99b227a657672d7dfe060822";//自高容僕Appkey
 	@Autowired
 	private TimerService timerService;
 	public ApplicationServiceImpl(){
@@ -28,6 +33,7 @@ public class ApplicationServiceImpl implements ApplicationService{
 		field=new HashMap<String, Map>();
 		field.put("randomCode", randomCode);
 		field.put("phoneCode", phoneCode);
+		
 	}
 	@Override
 	public boolean checkTokenOfShop(String token) {
@@ -110,6 +116,14 @@ public class ApplicationServiceImpl implements ApplicationService{
 		if(phoneCode.containsKey(phone)){
 			phoneCode.remove(phone);
 		}
+	}
+	@Override
+	public String getPushMasterSecret() {
+		return masterSecret;
+	}
+	@Override
+	public String getPushAppKey() {
+		return appKey;
 	}
 	
 }

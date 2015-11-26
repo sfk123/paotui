@@ -7,7 +7,7 @@ import com.shengping.paotui.model.Dx_Goods;
 
 public interface Dx_ChildShops_Service {
 	public int ShopRegister(Dx_ChildShops shop);
-	public Dx_ChildShops Login(String name,String pwd);
+	public Dx_ChildShops Login(String name,String pwd,String pushtag);
 	public Dx_ChildShops getById(int id);
 	public int updateLogo(String logoname,int id);
 	public int setTime(int id,String time);

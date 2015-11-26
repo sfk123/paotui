@@ -35,5 +35,11 @@ public class Dx_RecAddressDaoImpl implements Dx_RecAddressDao{
 		Query query=getSession().createQuery(hql).setParameter("userid", userid);
 		return query.list();
 	}
+	@Override
+	public Dx_RecAddress getDefaultAddress(int userid) {
+		String hql="from Dx_RecAddress where UserId=(:userid) and OrderIndex=(:index)";
+		Query query=getSession().createQuery(hql).setParameter("userid", userid).setParameter("index", -1);
+		return (Dx_RecAddress)query.uniqueResult();
+	}
 
 }

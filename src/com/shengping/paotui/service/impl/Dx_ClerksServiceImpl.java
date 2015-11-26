@@ -1,5 +1,7 @@
 package com.shengping.paotui.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +19,12 @@ public class Dx_ClerksServiceImpl implements Dx_ClerksService{
 		return dx_ClerksDao.register(clerk);
 	}
 	@Override
-	public Dx_Clerks login(String username, String pwd) {
-		return dx_ClerksDao.login(username, pwd);
+	public Dx_Clerks login(String username, String pwd,String pushTag) {
+		Dx_Clerks clerks=dx_ClerksDao.login(username, pwd);
+		if(clerks!=null){
+			dx_ClerksDao.setPushTag(pushTag, clerks.getCL_ID());
+		}
+		return clerks;
 	}
 	@Override
 	public int updateStatus(int status, int pusherid) {
@@ -29,6 +35,11 @@ public class Dx_ClerksServiceImpl implements Dx_ClerksService{
 	public boolean testPhone(String phone) {
 		// TODO Auto-generated method stub
 		return dx_ClerksDao.testPhone(phone);
+	}
+	@Override
+	public List<Dx_Clerks> getOnlineOfBusiness(int businessid) {
+		// TODO Auto-generated method stub
+		return dx_ClerksDao.getOnlineOfBusiness(businessid);
 	}
 
 }

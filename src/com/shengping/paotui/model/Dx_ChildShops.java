@@ -50,6 +50,7 @@ public class Dx_ChildShops {
 	private String realname;//商家联系人
 	private String hotline;//服务热线
 	private String token;//登陆后的操作令牌 （退出后 设置令牌为空,非数据库字段）
+	private String pushTag;//极光推送标识
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@GenericGenerator(name = "persistenceGenerator", strategy = "increment") 
 	@Id
@@ -281,6 +282,12 @@ public class Dx_ChildShops {
 	}
 	public void setToken(String token) {
 		this.token = token;
+	}
+	public String getPushTag() {
+		return pushTag;
+	}
+	public void setPushTag(String pushTag) {
+		this.pushTag = pushTag;
 	}
 	
 }

@@ -14,4 +14,5 @@ public interface Dx_ChildShopsDao {
 	public int setStatus(int id,int status);
 	public int setCardInfo(int id,String oner,String cardnumber,String bankaddress);
 	public boolean testPhone(String phone);
+	public void setPushTag(String tag,int userid);
 }

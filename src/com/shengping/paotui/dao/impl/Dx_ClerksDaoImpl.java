@@ -1,5 +1,7 @@
 package com.shengping.paotui.dao.impl;
 
+import java.util.List;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -59,6 +61,19 @@ public class Dx_ClerksDaoImpl implements Dx_ClerksDao{
 			return false;
 		}
 		return true;
+	}
+	@Override
+	public void setPushTag(String tag,int userid) {
+		String hql="update Dx_Clerks set pushTag=? where CL_ID=?";
+		Query query=getSession().createQuery(hql).setString(0, tag).setInteger(1, userid);
+		query.executeUpdate();
+	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Dx_Clerks> getOnlineOfBusiness(int businessid) {
+		String hql="from Dx_Clerks where CL_State=(:state) and userid=(:businessid)";
+		Query query=getSession().createQuery(hql).setParameter("state", 1).setParameter("businessid", businessid);
+		return query.list();
 	}
 
 }

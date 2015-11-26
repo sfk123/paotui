@@ -97,9 +97,10 @@ public class ShopHandler {
 		return message;
 	}
 	@RequestMapping(value="/login", method = RequestMethod.POST)//ÉÌ¼ÒµÇÂ½
-	public ReturnMessage shopLogin(@RequestParam(value="name",required=true) String name,@RequestParam(value="pwd",required=true) String pwd){
+	public ReturnMessage shopLogin(@RequestParam(value="name",required=true) String name,@RequestParam(value="pwd",required=true) String pwd
+			,@RequestParam(value = "pushTag", required = true) String pushTag){
 		ReturnMessage message=new ReturnMessage();
-		Dx_ChildShops data=shopService.Login(name, pwd);
+		Dx_ChildShops data=shopService.Login(name, pwd,pushTag);
 		if(data!=null){
 			message.setStatus(true);
 			String token=TokenProcessor.getInstance().generateTokeCode();

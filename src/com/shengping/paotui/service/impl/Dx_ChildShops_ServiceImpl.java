@@ -22,9 +22,12 @@ public class Dx_ChildShops_ServiceImpl implements Dx_ChildShops_Service{
 	}
 
 	@Override
-	public Dx_ChildShops Login(String name, String pwd) {
-		// TODO Auto-generated method stub
-		return shopDao.Login(name, pwd);
+	public Dx_ChildShops Login(String name, String pwd,String pushtag) {
+		Dx_ChildShops shop=shopDao.Login(name, pwd);
+		if(shop!=null){
+			shopDao.setPushTag(pushtag, shop.getMD_ID());
+		}
+		return shop;
 	}
 
 	@Override
