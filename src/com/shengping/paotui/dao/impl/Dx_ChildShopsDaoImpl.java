@@ -123,6 +123,12 @@ public class Dx_ChildShopsDaoImpl implements Dx_ChildShopsDao{
 		query.executeUpdate();
 		
 	}
+	@Override
+	public void logout(String phone) {
+		String hql="update Dx_ChildShops set pushTag=(:tag) where MD_Phone=(:phone)";
+		Query query=getSession().createQuery(hql).setParameter("tag", null).setParameter("phone", phone);
+		query.executeUpdate();
+	}
 	
 
 }

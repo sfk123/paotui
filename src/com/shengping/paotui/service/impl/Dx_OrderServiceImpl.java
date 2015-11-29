@@ -26,10 +26,12 @@ import com.shengping.paotui.dao.Dx_OrderDao;
 import com.shengping.paotui.model.Dt_SysConfig;
 import com.shengping.paotui.model.Dx_Clerks;
 import com.shengping.paotui.model.Dx_Order;
+import com.shengping.paotui.model.Dx_RecAddress;
 import com.shengping.paotui.service.ApplicationService;
 import com.shengping.paotui.service.Dt_SysConfigService;
 import com.shengping.paotui.service.Dx_ClerksService;
 import com.shengping.paotui.service.Dx_OrderService;
+import com.shengping.paotui.service.Dx_RecAddressService;
 @Service
 public class Dx_OrderServiceImpl implements Dx_OrderService{
 
@@ -42,53 +44,36 @@ public class Dx_OrderServiceImpl implements Dx_OrderService{
 	private Dt_SysConfigService dt_SysConfigService;
 	@Autowired
 	private Dx_ClerksService dx_ClerksService;
-	private Log log = LogFactory.getLog(Dx_OrderServiceImpl.class);
 	@Override
 	public int addOrder(Dx_Order order) {
 		int id=dx_OrderDao.addOrder(order);
 		if(id>0){
-			order.setId(id);
 			Dt_SysConfig business_paotui=dt_SysConfigService.getByArea(order.getAreaid());
 			System.out.println("跑腿公司："+business_paotui.getCompanyName());
 			List<Dx_Clerks> clerks_online=dx_ClerksService.getOnlineOfBusiness(business_paotui.getId());
-			log.info("在线跑腿哥数量："+clerks_online);
+			System.out.println("在线跑腿哥数量："+clerks_online.size());
 			List<String> alias=new ArrayList<String>();
 			for(Dx_Clerks clerks:clerks_online){
-				log.info("alias:"+clerks.getPushTag());
 				alias.add(clerks.getPushTag());
 			}
-			JPushClient jpushClient = new JPushClient(applicationService.getPushMasterSecret(), applicationService.getPushAppKey(), 3);
-			
-			JSONObject data=new JSONObject();
-			data.put("type", "order_pusher");
-			data.put("data", JSONObject.fromObject(order));
-	        // For push, all you need do is to build PushPayload object.
-	        PushPayload payload = buildPushObject_all_alias_alert(alias,data.toString());
-
-	        try {
-	            PushResult result = jpushClient.sendPush(payload);
-	            log.debug("Got result - " + result);
-
-	        } catch (APIConnectionException e) {
-	            // Connection error, should retry later
-	        	log.error("Connection error, should retry later", e);
-
-	        } catch (APIRequestException e) {
-	            // Should review the error, and fix the request
-	        	log.error("Should review the error, and fix the request", e);
-	        	log.info("HTTP Status: " + e.getStatus());
-	        	log.info("Error Code: " + e.getErrorCode());
-	        	log.info("Error Message: " + e.getErrorMessage());
-	        }
+			if(alias.size()>0){//当跑腿哥在线数量大于零时才推送
+				JSONObject data=new JSONObject();
+				data.put("type", "order_pusher");
+				data.put("orderid", id);
+				applicationService.JPush(alias, data.toString());
+			}
 		}
 		return id;
 	}
-	private PushPayload buildPushObject_all_alias_alert(List<String> alias,String content) {
-        return PushPayload.newBuilder()
-                .setPlatform(Platform.all())
-                .setAudience(Audience.alias(alias))
-//                .setNotification(Notification.alert(ALERT))
-                .setMessage(Message.content(content))
-                .build();
-    }
+	
+	@Override
+	public Dx_Order getOrderById(int id) {
+		// TODO Auto-generated method stub
+		return dx_OrderDao.getOrderById(id);
+	}
+	@Override
+	public List<Dx_Order> getOrder_new(int areaid,int pageNo,int pageSize) {
+		// TODO Auto-generated method stub
+		return dx_OrderDao.getOrder_new(areaid,pageNo,pageSize);
+	}
 }

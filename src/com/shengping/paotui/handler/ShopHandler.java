@@ -115,10 +115,12 @@ public class ShopHandler {
 		return message;
 	}
 	@RequestMapping(value="/logout", method = RequestMethod.POST)//商家退出
-	public ReturnMessage shopLogout(@RequestParam(value="username",required=true) String username,@RequestParam(value="token",required=true) String token){
+	public ReturnMessage shopLogout(@RequestParam(value="token",required=true) String token){
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
-			applicationService.ShopLogOut(username);
+		String phone=applicationService.checkTokenOfShop(token);
+		if(phone!=null){
+			shopService.logout(phone);
+			applicationService.ShopLogOut(phone);
 			message.setStatus(true);
 		}else{
 			message.setStatus(false);
@@ -129,7 +131,7 @@ public class ShopHandler {
 	@RequestMapping(value="/comment", method = RequestMethod.POST)//获取商家评论
 	public ReturnMessage getComment(@RequestParam(value="shopid",required=true) int shopid,@RequestParam(value="token",required=true) String token){
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfShop(token)!=null){
 			message.setStatus(true);
 			message.setData(dx_plService.getBuyShop(shopid));
 		}else{
@@ -142,7 +144,7 @@ public class ShopHandler {
 	public ReturnMessage upLoadLogo(@RequestParam(value="shopid",required=true) int shopid,@RequestParam(value="token",required=true) String token,
 			@RequestParam(value = "avatar", required = false) MultipartFile file,HttpServletRequest request){
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfShop(token)!=null){
 			Dx_ChildShops shop=shopService.getById(shopid);
 			if(shop==null){
 				message.setStatus(false);
@@ -189,7 +191,7 @@ public class ShopHandler {
 	public ReturnMessage setTime(@RequestParam(value="shopid",required=true) int shopid,@RequestParam(value="token",required=true) String token,
 			@RequestParam(value="time",required=true) String time){//设置营业时间
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfShop(token)!=null){
 			if(shopService.setTime(shopid, time)==1){
 				message.setStatus(true);
 				message.setMessage("设置成功！");
@@ -207,7 +209,7 @@ public class ShopHandler {
 	public ReturnMessage setAddress(@RequestParam(value="shopid",required=true) int shopid,@RequestParam(value="token",required=true) String token,
 			@RequestParam(value="address",required=true) String address,@RequestParam(value="latlong",required=true) String latlong){//设置营业时间
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfShop(token)!=null){
 			if(shopService.setAddress(shopid, address, latlong)==1){
 				message.setStatus(true);
 				message.setData(address);
@@ -226,7 +228,7 @@ public class ShopHandler {
 	public ReturnMessage setPhone(@RequestParam(value="shopid",required=true) int shopid,@RequestParam(value="token",required=true) String token,
 			@RequestParam(value="phone",required=true) String phone){//设置店铺电话
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfShop(token)!=null){
 			if(shopService.setPhone(shopid, phone)==1){
 				message.setStatus(true);
 				message.setMessage("设置成功！");
@@ -244,7 +246,7 @@ public class ShopHandler {
 	public ReturnMessage ResetPwd(@RequestParam(value="shopid",required=true) int shopid,@RequestParam(value="token",required=true) String token,
 			@RequestParam(value="old",required=true) String old,@RequestParam(value="newpwd",required=true) String newpwd){//设置店铺电话
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfShop(token)!=null){
 			if(shopService.ResetPwd(shopid, old, newpwd)){
 				message.setStatus(true);
 				message.setMessage("修改成功！");
@@ -262,7 +264,7 @@ public class ShopHandler {
 	public ReturnMessage setStatus(@RequestParam(value="shopid",required=true) int shopid,@RequestParam(value="token",required=true) String token,
 			@RequestParam(value="status",required=true) int status){//设置店铺电话
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfShop(token)!=null){
 			if(shopService.setStatus(shopid, status)==1){
 				message.setStatus(true);
 				message.setMessage("修改成功！");
@@ -281,7 +283,7 @@ public class ShopHandler {
 			@RequestParam(value="oner_name",required=true) String oner_name,@RequestParam(value="bankNumber",required=true) String bankNumber,
 			@RequestParam(value="bankAddress",required=false) String bankAddress){//设置店铺电话
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfShop(token)!=null){
 			if(shopService.setCardInfo(shopid, oner_name, bankNumber, bankAddress)==1){
 				message.setStatus(true);
 				message.setMessage("保存成功！");
@@ -299,7 +301,7 @@ public class ShopHandler {
 	public ReturnMessage addProductClass(@RequestParam(value="shopid",required=true) int shopid,@RequestParam(value="token",required=true) String token,
 			@RequestParam(value="typeName",required=true) String typeName,@RequestParam(value="index",required=true) int index){
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfShop(token)!=null){
 			Dx_ClassTable class_=new Dx_ClassTable();
 			class_.setC_ParentId(shopid);
 			class_.setC_Title(typeName);
@@ -320,7 +322,7 @@ public class ShopHandler {
 	@RequestMapping(value="/getProductClassByShop", method = RequestMethod.POST)	//获取商店所有产品分类
 	public ReturnMessage getProductClassByShop(@RequestParam(value="shopid",required=true) int shopid,@RequestParam(value="token",required=true) String token){
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfShop(token)!=null){
 			message.setStatus(true);
 			message.setData(classService.getByShop(shopid));
 		}else{
@@ -334,7 +336,7 @@ public class ShopHandler {
 			@RequestParam(value = "avatar", required = true) MultipartFile goodImg,HttpServletRequest request,@RequestParam(value="name",required=true) String name
 			,@RequestParam(value="price",required=true) double price,@RequestParam(value="BZF",required=true) double BZF,@RequestParam(value="index",required=true) int index){
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfShop(token)!=null){
 			Dx_ClassTable class_=classService.getById(typeid);
 			Dx_ChildShops shop=shopService.getById(class_.getC_ParentId());
 			String goodName=PinYinUtil.getPinYin(name);
@@ -383,7 +385,7 @@ public class ShopHandler {
 	public ReturnMessage getGoodByClass(@RequestParam(value="classid",required=true) int classid,@RequestParam(value="token",required=true) String token,
 			@RequestParam(value="shopid",required=false) int shopid){
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfShop(token)!=null){
 			message.setStatus(true);
 			if(classid==0){
 				message.setData(dx_GoodsService.getGoods_undercarriage(shopid));
@@ -401,7 +403,7 @@ public class ShopHandler {
 			,@RequestParam(value="price",required=true) double price,@RequestParam(value="BZF",required=true) double BZF
 			,@RequestParam(value="index",required=true) int index,@RequestParam(value="online",required=true) int online){
 		ReturnMessage message=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfShop(token)!=null){
 			Dx_Goods good=dx_GoodsService.getByid(goodid);
 			if(goodImg!=null){
 				Dx_ClassTable class_=classService.getById(good.getClassId());

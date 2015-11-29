@@ -28,5 +28,10 @@ public class Dx_RecAddressServiceImpl implements Dx_RecAddressService{
 		// TODO Auto-generated method stub
 		return dx_RecAddressDao.getDefaultAddress(userid);
 	}
+	@Override
+	public Dx_RecAddress getById(int id) {
+		// TODO Auto-generated method stub
+		return dx_RecAddressDao.getById(id);
+	}
 
 }

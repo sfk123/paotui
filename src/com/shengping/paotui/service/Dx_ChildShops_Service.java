@@ -17,4 +17,5 @@ public interface Dx_ChildShops_Service {
 	public int setStatus(int id,int status);
 	public int setCardInfo(int id,String oner,String cardnumber,String bankaddress);
 	public boolean testPhone(String phone) ;
+	public void logout(String phone);
 }

@@ -37,8 +37,7 @@ public class Dx_Order {
 	private int Djzt;
 	private int PSYID;//跑腿哥id（Dx_Clerks.CL_ID）
 	@NotEmpty(message="当前城市编码不能为空")
-	private String  Areaid;//当前订单城市编码
-	private String useridd;
+	private String  Areaid;//订单所在城市编码
 	private int Chick;
 	private double BaoZhuang;//包装费
 	private int OrderIsOk;//订单状态
@@ -172,12 +171,6 @@ public class Dx_Order {
 	}
 	public void setAreaid(String areaid) {
 		Areaid = areaid;
-	}
-	public String getUseridd() {
-		return useridd;
-	}
-	public void setUseridd(String useridd) {
-		this.useridd = useridd;
 	}
 	public int getChick() {
 		return Chick;

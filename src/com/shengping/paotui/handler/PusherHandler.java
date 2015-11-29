@@ -3,8 +3,12 @@ package com.shengping.paotui.handler;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.hibernate.validator.constraints.Email;
@@ -21,8 +25,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.shengping.paotui.handler.model.ReturnMessage;
 import com.shengping.paotui.model.Dx_Clerks;
+import com.shengping.paotui.model.Dx_Order;
+import com.shengping.paotui.model.Dx_RecAddress;
 import com.shengping.paotui.service.ApplicationService;
 import com.shengping.paotui.service.Dx_ClerksService;
+import com.shengping.paotui.service.Dx_OrderService;
+import com.shengping.paotui.service.Dx_RecAddressService;
 import com.shengping.paotui.util.PinYinUtil;
 import com.shengping.paotui.util.TokenProcessor;
 
@@ -30,11 +38,15 @@ import com.shengping.paotui.util.TokenProcessor;
 @RequestMapping("/pusherservice")
 @RestController
 public class PusherHandler {
-
+	
 	@Autowired
 	private Dx_ClerksService dx_ClerksService;
 	@Autowired
 	private ApplicationService applicationService;
+	@Autowired
+	private Dx_RecAddressService dx_RecAddressService;
+	@Autowired
+	private Dx_OrderService dx_OrderService;
 	@RequestMapping(value="/sendCode", method = RequestMethod.POST)	//跑腿哥注册
 	public ReturnMessage SendCode(@RequestParam(value = "phone", required = true) String phone){
 		ReturnMessage returnMessage=new ReturnMessage();
@@ -149,7 +161,7 @@ public class PusherHandler {
 		Dx_Clerks clerks=dx_ClerksService.login(username, pwd,pushTag);
 		if(clerks!=null){
 			String token=TokenProcessor.getInstance().generateTokeCode();
-			applicationService.addToken_Shop(username,token);
+			applicationService.addToken_Pusher(username,token);
 			clerks.setToken(token);
 			returnMessage.setData(clerks);
 			returnMessage.setStatus(true);
@@ -159,18 +171,99 @@ public class PusherHandler {
 		}
 		return returnMessage;
 	}
-	@RequestMapping(value="/updateStatus", method = RequestMethod.POST)	//跑腿哥注册
-	public ReturnMessage updateStatus(@RequestParam(value = "token", required = true) String token,@RequestParam(value = "status", required = true) int status
-			,@RequestParam(value = "pusherid", required = true) int pusherid){
+	@RequestMapping(value="/logout", method = RequestMethod.POST)	//跑腿哥注册
+	public ReturnMessage logout(@RequestParam(value = "token", required = true) String token,@RequestParam(value = "pusherid", required = true) int pusherid){
 		ReturnMessage returnMessage=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
-			dx_ClerksService.updateStatus(status, pusherid);
+		String phone=applicationService.checkTokenOfPusher(token);
+		if(phone!=null){
+			dx_ClerksService.logout(pusherid);
+			returnMessage.setStatus(true);
+			applicationService.PusherLogOut(phone);
+		}else{
+			returnMessage.setStatus(false);
+			returnMessage.setMessage("非法操作");
+		}
+		return returnMessage;
+	}
+	@RequestMapping(value="/updateStatus", method = RequestMethod.POST)	//跑腿哥注册
+	public ReturnMessage updateStatus(@RequestParam(value = "token", required = true) String token,@RequestParam(value = "status", required = true) int status){
+		ReturnMessage returnMessage=new ReturnMessage();
+		String phone=applicationService.checkTokenOfPusher(token);
+		if(phone!=null){
+			dx_ClerksService.updateStatus(status, phone);
 			if(status==1){
 				returnMessage.setData(true);
 			}else{
 				returnMessage.setData(false);
 			}
 			returnMessage.setStatus(true);
+		}else{
+			returnMessage.setStatus(false);
+			returnMessage.setMessage("非法操作");
+		}
+		return returnMessage;
+	}
+	@RequestMapping(value="/getOrderByid", method = RequestMethod.POST)//
+	public ReturnMessage getOrderByid(@RequestParam(value = "token", required = true) String token,@RequestParam(value = "id", required = true) int id){
+		ReturnMessage returnMessage=new ReturnMessage();
+		if(applicationService.checkTokenOfPusher(token)!=null){
+			Dx_Order order=dx_OrderService.getOrderById(id);
+			Dx_RecAddress address=dx_RecAddressService.getById(order.getAddressid());
+			JSONObject json_order=JSONObject.fromObject(order);
+			json_order.put("createTime", order.getCreateTime().getTime());
+			json_order.put("address", JSONObject.fromObject(address));
+			returnMessage.setStatus(true);
+			returnMessage.setData(json_order.toString());
+		}else{
+			returnMessage.setStatus(false);
+			returnMessage.setMessage("非法操作");
+		}
+		return returnMessage;
+	}
+	@RequestMapping(value="/getOrder_new", method = RequestMethod.POST)//获取所有可以抢的订单
+	public ReturnMessage getOrder_new(@RequestParam(value = "token", required = true) String token,@RequestParam(value = "areaid", required = true) int areaid
+			,@RequestParam(value = "pageNo", required = true) int pageNo,@RequestParam(value = "pageSize", required = true) int pageSize){
+		ReturnMessage returnMessage=new ReturnMessage();
+		String phone=applicationService.checkTokenOfPusher(token);
+		if(phone!=null){
+			JSONArray data_array=new JSONArray();
+			List<Dx_Order> orders=dx_OrderService.getOrder_new(areaid,pageNo,pageSize);
+			System.out.println("order size:"+orders.size());
+			for(Dx_Order order:orders){
+				Dx_RecAddress address=dx_RecAddressService.getById(order.getAddressid());
+				JSONObject json_order=JSONObject.fromObject(order);
+				json_order.put("createTime", order.getCreateTime().getTime());
+				json_order.put("address", JSONObject.fromObject(address));
+				data_array.add(json_order);
+			}
+			
+			returnMessage.setStatus(true);
+			returnMessage.setData(data_array.toString());
+		}else{
+			returnMessage.setStatus(false);
+			returnMessage.setMessage("非法操作");
+		}
+		return returnMessage;
+	}
+	@RequestMapping(value="/work_on", method = RequestMethod.POST)//跑腿哥上班
+	public ReturnMessage work_on(@RequestParam(value = "token", required = true) String token,@RequestParam(value = "areaid", required = true) int areaid
+			,@RequestParam(value = "pageNo", required = true) int pageNo,@RequestParam(value = "pageSize", required = true) int pageSize){
+		ReturnMessage returnMessage=new ReturnMessage();
+		String phone=applicationService.checkTokenOfPusher(token);
+		if(phone!=null){
+			dx_ClerksService.updateStatus(1, phone);
+			JSONArray data_array=new JSONArray();
+			List<Dx_Order> orders=dx_OrderService.getOrder_new(areaid,pageNo,pageSize);
+			for(Dx_Order order:orders){
+				Dx_RecAddress address=dx_RecAddressService.getById(order.getAddressid());
+				JSONObject json_order=JSONObject.fromObject(order);
+				json_order.put("createTime", order.getCreateTime().getTime());
+				json_order.put("address", JSONObject.fromObject(address));
+				data_array.add(json_order);
+			}
+			
+			returnMessage.setStatus(true);
+			returnMessage.setData(data_array.toString());
 		}else{
 			returnMessage.setStatus(false);
 			returnMessage.setMessage("非法操作");

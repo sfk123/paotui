@@ -1,5 +1,9 @@
 package com.shengping.paotui.handler;
 
+import java.util.Date;
+
+import net.sf.json.JSONObject;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -81,7 +85,7 @@ public class CustomerHandler {
 			member.setM_ID(id);
 			member.setM_SYMoney(0);
 			String token=TokenProcessor.getInstance().generateTokeCode();
-			applicationService.addToken_Shop(phone,token);
+			applicationService.addToken_Customer(phone,token);
 			member.setToken(token);
 			if(id>0){
 				returnMessage.setStatus(true);
@@ -104,7 +108,7 @@ public class CustomerHandler {
 		Dx_Member member=dx_MemberService.Login(phone, pwd);
 		if(member!=null){
 			String token=TokenProcessor.getInstance().generateTokeCode();
-			applicationService.addToken_Shop(phone,token);
+			applicationService.addToken_Customer(phone,token);
 			member.setToken(token);
 			returnMessage.setStatus(true);
 			returnMessage.setData(member);
@@ -118,8 +122,8 @@ public class CustomerHandler {
 	@RequestMapping(value="/logout", method = RequestMethod.POST)	//用户密码登录
 	public ReturnMessage logout(@RequestParam(value = "token", required = true) String token,@RequestParam(value = "phone", required = true) String phone){
 		ReturnMessage returnMessage=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
-			applicationService.ShopLogOut(phone);
+		if(applicationService.checkTokenOfCustomer(token)){
+			applicationService.CustomerLogOut(phone);
 			returnMessage.setStatus(true);
 		}else{
 			returnMessage.setStatus(false);
@@ -157,7 +161,7 @@ public class CustomerHandler {
 				if(applicationService.testPhoneCode(phone, code)){
 					returnMessage.setStatus(true);
 					String token=TokenProcessor.getInstance().generateTokeCode();
-					applicationService.addToken_Shop(phone,token);
+					applicationService.addToken_Customer(phone,token);
 					Dx_Member member=dx_MemberService.getByPhone(phone);
 					member.setToken(token);
 					returnMessage.setData(member);
@@ -190,7 +194,11 @@ public class CustomerHandler {
 			returnMessage.setStatus(false);
 			returnMessage.setMessage(result.getFieldError().getDefaultMessage());
 		}else{
-			if(applicationService.checkTokenOfShop(token)){
+			if(applicationService.checkTokenOfCustomer(token)){
+				order.setCreateTime(new Date());
+				if(order.getFwType()==3){//帮我送订单，服务器生成订单号
+					order.setOrderNumber(applicationService.getOrderNumber());
+				}
 				if(dx_OrderService.addOrder(order)>0){
 					returnMessage.setStatus(true);
 					returnMessage.setMessage("下单成功，请保持电话畅通，等待工作人员与您取得联系");
@@ -205,14 +213,21 @@ public class CustomerHandler {
 		}
 		return returnMessage;
 	}
-	@RequestMapping(value="/crearAddress", method = RequestMethod.POST)//添加收货地址
-	public ReturnMessage crearAddress(@RequestParam(value = "token", required = true) String token,@Validated Dx_RecAddress address,BindingResult result){
+	@RequestMapping(value="/getOrderNumber")	//获取唯一订单号
+	public ReturnMessage getOrderNumber(){
+		ReturnMessage returnMessage=new ReturnMessage();
+		returnMessage.setStatus(true);
+		returnMessage.setMessage(applicationService.getOrderNumber());
+		return returnMessage;
+	}
+	@RequestMapping(value="/creatAddress", method = RequestMethod.POST)//添加收货地址
+	public ReturnMessage creatAddress(@RequestParam(value = "token", required = true) String token,@Validated Dx_RecAddress address,BindingResult result){
 		ReturnMessage returnMessage=new ReturnMessage();
 		if(result.hasErrors()){
 			returnMessage.setStatus(false);
 			returnMessage.setMessage(result.getFieldError().getDefaultMessage());
 		}else{
-			if(applicationService.checkTokenOfShop(token)){
+			if(applicationService.checkTokenOfCustomer(token)){
 				int id=dx_RecAddressService.creatAddress(address);
 				address.setId(id);
 				returnMessage.setStatus(true);
@@ -228,7 +243,7 @@ public class CustomerHandler {
 	@RequestMapping(value="/getAddressList", method = RequestMethod.POST)//添加收货地址
 	public ReturnMessage getAddressList(@RequestParam(value = "token", required = true) String token,@RequestParam(value = "userid", required = true) int userid){
 		ReturnMessage returnMessage=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfCustomer(token)){
 			
 			returnMessage.setStatus(true);
 			returnMessage.setData(dx_RecAddressService.getAddressList(userid));
@@ -241,7 +256,7 @@ public class CustomerHandler {
 	@RequestMapping(value="/getDefaultAddress", method = RequestMethod.POST)//添加收货地址
 	public ReturnMessage getDefaultAddress(@RequestParam(value = "token", required = true) String token,@RequestParam(value = "userid", required = true) int userid){
 		ReturnMessage returnMessage=new ReturnMessage();
-		if(applicationService.checkTokenOfShop(token)){
+		if(applicationService.checkTokenOfCustomer(token)){
 			
 			returnMessage.setStatus(true);
 			returnMessage.setData(dx_RecAddressService.getDefaultAddress(userid));
@@ -251,4 +266,18 @@ public class CustomerHandler {
 		}
 		return returnMessage;
 	}
+	@RequestMapping(value="/getAddressByid", method = RequestMethod.POST)//添加收货地址
+	public ReturnMessage getAddressByid(@RequestParam(value = "token", required = true) String token,@RequestParam(value = "id", required = true) int id){
+		ReturnMessage returnMessage=new ReturnMessage();
+		if(applicationService.checkTokenOfCustomer(token)){
+			
+			returnMessage.setStatus(true);
+			returnMessage.setData(dx_RecAddressService.getById(id));
+		}else{
+			returnMessage.setStatus(false);
+			returnMessage.setMessage("非法操作");
+		}
+		return returnMessage;
+	}
+	
 }

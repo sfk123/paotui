@@ -54,6 +54,12 @@ public class Dx_ClerksDaoImpl implements Dx_ClerksDao{
 		return query.executeUpdate();
 	}
 	@Override
+	public int updateStatus(int status,String phone) {
+		String hql="update Dx_Clerks set CL_State=? where CL_LoginName=?";
+		Query query=getSession().createQuery(hql).setInteger(0, status).setString(1, phone);
+		return query.executeUpdate();
+	}
+	@Override
 	public boolean testPhone(String phone) {
 		String hql="from Dx_Clerks where CL_Tell=?";
 		Query query=getSession().createQuery(hql).setString(0, phone);
@@ -74,6 +80,12 @@ public class Dx_ClerksDaoImpl implements Dx_ClerksDao{
 		String hql="from Dx_Clerks where CL_State=(:state) and userid=(:businessid)";
 		Query query=getSession().createQuery(hql).setParameter("state", 1).setParameter("businessid", businessid);
 		return query.list();
+	}
+	@Override
+	public void logout(int userid) {//≈‹Õ»∏ÁÕÀ≥ˆ
+		String hql="update Dx_Clerks set pushTag=(:tag) ,CL_State=(:state) where CL_ID=(:id)";
+		Query query=getSession().createQuery(hql).setString("tag", "").setParameter("state", 0).setParameter("id", userid);
+		query.executeUpdate();
 	}
 
 }

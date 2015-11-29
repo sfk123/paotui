@@ -4,12 +4,25 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 
 public class MyUtil {
 	public static String stringToMD5(String string) {  
@@ -104,4 +117,89 @@ public class MyUtil {
         temp.put(randomCode.toString(), buffImg);
         return temp;
 	}
+	/**
+     * 将对象转换成base64编码的字符串
+     * @return
+     */
+    public static void saveObject(Object obj,String fileName){
+ 	   // 创建字节输出流  
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+        try {  
+            // 创建对象输出流，并封装字节流  
+            ObjectOutputStream oos = new ObjectOutputStream(baos);  
+            // 将对象写入字节流  
+            oos.writeObject(obj);  
+            // 将字节流编码成base64的字符窜  
+            String obj_Base64 = new String(Base64.encodeBase64(baos.toByteArray()));  
+            FileWriter fwriter = null;
+            try {
+             fwriter = new FileWriter("D:/"+fileName+".txt");
+             fwriter.write(obj_Base64);
+            } catch (IOException ex) {
+             ex.printStackTrace();
+            } finally {
+             try {
+              fwriter.flush();
+              fwriter.close();
+             } catch (IOException ex) {
+              ex.printStackTrace();
+             }
+            }
+        } catch (IOException e) {  
+            e.printStackTrace();
+        }  
+    }
+    /**
+     * 将base64编码的字符串 转换成对象
+     */
+    @SuppressWarnings("unused")
+	public static Object StringToObj(String fileName){
+        StringBuffer strbuffer=new StringBuffer();
+    	try {
+            String encoding="utf-8";
+            File file=new File("D:/"+fileName+".txt");
+            if(file.isFile() && file.exists()){ //判断文件是否存在
+                InputStreamReader read = new InputStreamReader(new FileInputStream(file),encoding);//考虑到编码格式
+                BufferedReader bufferedReader = new BufferedReader(read);
+                String lineTxt;
+                while((lineTxt = bufferedReader.readLine()) != null){
+//                    System.out.println(lineTxt);
+                    strbuffer.append(lineTxt);
+                }
+                read.close();
+    }else{
+        System.out.println("找不到指定的文件");
+        return null;
+    }
+    } catch (Exception e) {
+        System.out.println("读取文件内容出错");
+        e.printStackTrace();
+        return null;
+    }
+        Object obj=null;
+    	if(strbuffer.toString().length()>0){
+ 	   //读取字节  
+        byte[] base64 = Base64.decodeBase64(strbuffer.toString().getBytes());  
+        //封装到字节流  
+        ByteArrayInputStream bais = new ByteArrayInputStream(base64);  
+        try {  
+            //再次封装  
+            ObjectInputStream bis = new ObjectInputStream(bais);  
+            try {  
+                //读取对象  
+         	   obj = (Object) bis.readObject();  
+            } catch (ClassNotFoundException e) {  
+                // TODO Auto-generated catch block  
+                e.printStackTrace();  
+            }  
+        } catch (StreamCorruptedException e) {  
+            // TODO Auto-generated catch block  
+            e.printStackTrace();  
+        } catch (IOException e) {  
+            // TODO Auto-generated catch block  
+            e.printStackTrace();  
+        } 
+    	}
+        return obj;
+    }
 }

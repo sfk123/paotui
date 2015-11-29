@@ -8,4 +8,5 @@ public interface Dx_RecAddressDao {
 	public int creatAddress(Dx_RecAddress address);
 	public List<Dx_RecAddress> getAddressList(int userid);
 	public Dx_RecAddress getDefaultAddress(int userid);
+	public Dx_RecAddress getById(int id);
 }
